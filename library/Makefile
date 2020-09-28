@@ -84,6 +84,7 @@ clean:
 	$(MAKE) -C jesd204/jesd204_tx clean
 	$(MAKE) -C jesd204/jesd204_tx_static_config clean
 	$(MAKE) -C spi_engine/axi_spi_engine clean
+	$(MAKE) -C spi_engine/spi_axis_reorder clean
 	$(MAKE) -C spi_engine/spi_engine_execution clean
 	$(MAKE) -C spi_engine/spi_engine_interconnect clean
 	$(MAKE) -C spi_engine/spi_engine_offload clean
@@ -198,6 +199,7 @@ lib:
 	$(MAKE) -C jesd204/jesd204_tx
 	$(MAKE) -C jesd204/jesd204_tx_static_config
 	$(MAKE) -C spi_engine/axi_spi_engine
+	$(MAKE) -C spi_engine/spi_axis_reorder
 	$(MAKE) -C spi_engine/spi_engine_execution
 	$(MAKE) -C spi_engine/spi_engine_interconnect
 	$(MAKE) -C spi_engine/spi_engine_offload
