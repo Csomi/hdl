@@ -51,9 +51,9 @@ module axi_pulse_gen_regmap #(
 
   output                  clk_out,
   output                  pulse_gen_resetn,
-  output      [31:0]      pulse_width,
-  output      [31:0]      pulse_period,
-  output                  load_config,
+  output      [4*32-1:0]  pulse_width,
+  output      [4*32-1:0]  pulse_period,
+  output      [ 3:0]      load_config,
 
   // processor interface
 
@@ -71,11 +71,11 @@ module axi_pulse_gen_regmap #(
 
   // internal registers
 
-  reg     [31:0]  up_scratch = 'd0;
-  reg     [31:0]  up_pulse_width = 'd0;
-  reg     [31:0]  up_pulse_period = 'd0;
-  reg             up_load_config = 1'b0;
-  reg             up_reset;
+  reg     [31:0]      up_scratch = 'd0;
+  reg     [4*32-1:0]  up_pulse_width = 'd0;
+  reg     [4*32-1:0]  up_pulse_period = 'd0;
+  reg     [ 3:0]      up_load_config = 4'b0;
+  reg                 up_reset;
 
   always @(posedge up_clk) begin
     if (up_rstn == 0) begin

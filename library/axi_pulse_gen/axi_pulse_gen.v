@@ -38,8 +38,14 @@ module axi_pulse_gen #(
 
   parameter       ID = 0,
   parameter [0:0] ASYNC_CLK_EN = 1,
-  parameter       PULSE_WIDTH = 7,
-  parameter       PULSE_PERIOD = 10 )(
+  parameter       PULSE_WIDTH_0 = 7,
+  parameter       PULSE_PERIOD_0 = 10,
+  parameter       PULSE_WIDTH_1 = 7,
+  parameter       PULSE_PERIOD_1 = 10,
+  parameter       PULSE_WIDTH_2 = 7,
+  parameter       PULSE_PERIOD_2 = 10,
+  parameter       PULSE_WIDTH_3 = 7,
+  parameter       PULSE_PERIOD_3 = 10)(
 
   // axi interface
 
@@ -65,11 +71,14 @@ module axi_pulse_gen #(
   output      [31:0]      s_axi_rdata,
   input                   s_axi_rready,
   input                   ext_clk,
-  output                  pulse);
+  output                  pulse0,
+  output                  pulse1,
+  output                  pulse2,
+  output                  pulse3);
 
   // local parameters
 
-  localparam [31:0] CORE_VERSION = {16'h0000,     /* MAJOR */
+  localparam [31:0] CORE_VERSION = {16'h1000,     /* MAJOR */
                                      8'h01,       /* MINOR */
                                      8'h00};      /* PATCH */ // 0.01.0
   localparam [31:0] CORE_MAGIC = 32'h504c5347;    // PLSG
@@ -87,9 +96,10 @@ module axi_pulse_gen #(
   wire            up_wreq_s;
   wire    [13:0]  up_waddr_s;
   wire    [31:0]  up_wdata_s;
-  wire    [31:0]  pulse_width_s;
-  wire    [31:0]  pulse_period_s;
-  wire            load_config_s;
+  wire    [4*32-1:0]  pulse_width_s;
+  wire    [4*32-1:0]  pulse_period_s;
+  wire    [3*32-1:0]  pulse_offset_s;
+  wire    [ 3:0]      load_config_s;
   wire            pulse_gen_resetn;
 
   assign up_clk = s_axi_aclk;
@@ -100,15 +110,23 @@ module axi_pulse_gen #(
     .ASYNC_CLK_EN (ASYNC_CLK_EN),
     .CORE_MAGIC (CORE_MAGIC),
     .CORE_VERSION (CORE_VERSION),
-    .PULSE_WIDTH (PULSE_WIDTH),
-    .PULSE_PERIOD (PULSE_PERIOD))
+    .PULSE_WIDTH_0 (PULSE_WIDTH_0),
+    .PULSE_PERIOD_0 (PULSE_PERIOD_0),
+    .PULSE_WIDTH_1 (PULSE_WIDTH_1),
+    .PULSE_PERIOD_1 (PULSE_PERIOD_1),
+    .PULSE_WIDTH_2 (PULSE_WIDTH_2),
+    .PULSE_PERIOD_2 (PULSE_PERIOD_2),
+    .PULSE_WIDTH_3 (PULSE_WIDTH_3),
+    .PULSE_PERIOD_3 (PULSE_PERIOD_3))
   i_regmap (
     .ext_clk (ext_clk),
     .clk_out (clk),
     .pulse_gen_resetn (pulse_gen_resetn),
     .pulse_width (pulse_width_s),
     .pulse_period (pulse_period_s),
+    .pulse_offset (pulse_offset_s),
     .load_config (load_config_s),
+    .sync_start (sync_start_s),
     .up_rstn (up_rstn),
     .up_clk (up_clk),
     .up_wreq (up_wreq_s),
@@ -120,16 +138,37 @@ module axi_pulse_gen #(
     .up_rdata (up_rdata_s),
     .up_rack (up_rack_s));
 
-  util_pulse_gen  #(
-    .PULSE_WIDTH(PULSE_WIDTH),
-    .PULSE_PERIOD(PULSE_PERIOD))
-  util_pulse_gen_i(
-    .clk (clk),
-    .rstn (pulse_gen_resetn),
-    .pulse_width (pulse_width_s),
-    .pulse_period (pulse_period_s),
-    .load_config (load_config_s),
-    .pulse (pulse));
+  generate begin
+    for (i=0; i<4; i=i+1) begin
+      util_pulse_gen  #(
+        .PULSE_WIDTH(PULSE_WIDTH),
+        .PULSE_PERIOD(PULSE_PERIOD))
+      util_pulse_gen_i(
+        .clk (clk),
+        .rstn (pulse_gen_resetn),
+        .sync (sync[i]),
+        .pulse_width (pulse_width_s[32*i+:32]),
+        .pulse_period (pulse_period_s[32*i+:32]),
+        .load_config (load_config_s[i]),
+        .pulse_counter(pulse_counter_s[32*i+:32]),
+        .pulse (pulse_s[i]));
+      if (i==0) begin
+        assign sync[0] = 0; // first util_pulse_gen instance is the reference, no need to synchronize
+      end else begin
+        assign sync[i] = sync_en & (pulse_offset_s[32*i+:32] == pulse_counter_s[31:0]);
+      end
+    end
+  end
+  endgenerate
+
+  // TODO: generate sync_en
+
+
+
+  assign pulse0 = pulse_s[0];
+  assign pulse1 = pulse_s[1];
+  assign pulse2 = pulse_s[2];
+  assign pulse3 = pulse_s[3];
 
   up_axi #(
     .AXI_ADDRESS_WIDTH(16))

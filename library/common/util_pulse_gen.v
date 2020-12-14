@@ -42,6 +42,7 @@ module util_pulse_gen #(
   input               clk,
   input               rstn,
 
+  input               sync,
   input       [31:0]  pulse_width,
   input       [31:0]  pulse_period,
   input               load_config,
@@ -85,7 +86,7 @@ module util_pulse_gen #(
   // a free running counter
 
   always @(posedge clk) begin
-    if (pulse_period_cnt == 1'b0) begin
+    if ((pulse_period_cnt == 1'b0) || sync) begin
       pulse_period_cnt <= pulse_period_d;
     end else begin
       pulse_period_cnt <= pulse_period_cnt - 1'b1;
