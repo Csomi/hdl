@@ -87,12 +87,5 @@ switch [get_env_param NUM_OF_SDI 4] {
   }
 }
 
-## NOTE: This is temporary, the new version of the board will not need it
-if { [get_env_param CLK_MODE 0] > 0 } {
-    adi_project_files ad463x_fmc_zed [list \
-      "system_constr_busy.xdc"
-    ]
-}
-
 adi_project_run ad463x_fmc_zed
 

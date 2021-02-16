@@ -5,7 +5,6 @@
 
 PROJECT_NAME := ad463x_fmc_zed
 
-M_DEPS += system_constr_busy.xdc
 M_DEPS += system_constr_8sdi.xdc
 M_DEPS += system_constr_4sdi.xdc
 M_DEPS += system_constr_2sdi.xdc
