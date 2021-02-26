@@ -466,7 +466,7 @@ module axi_spi_engine #(
     .ADDRESS_WIDTH(SDI_FIFO_ADDRESS_WIDTH),
     .M_AXIS_REGISTERED(0),
     .ALMOST_EMPTY_THRESHOLD(1),
-    .ALMOST_FULL_THRESHOLD(1)
+    .ALMOST_FULL_THRESHOLD(31)
   ) i_sdi_fifo (
     .s_axis_aclk(spi_clk),
     .s_axis_aresetn(spi_resetn),
