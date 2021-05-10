@@ -50,9 +50,13 @@ ad_ip_parameter spi_ad463x/execution CONFIG.DEFAULT_SPI_CFG 1   ; # latching MIS
 ## CNV generator; the actual sample rate will be PULSE_PERIOD * (1/cnv_ref_clk)
 set sampling_cycle [expr int(ceil(double($cnv_ref_clk * 1000000) / $adc_sampling_rate))]
 
-ad_ip_instance axi_pulse_gen cnv_generator
-ad_ip_parameter cnv_generator CONFIG.PULSE_PERIOD $sampling_cycle
-ad_ip_parameter cnv_generator CONFIG.PULSE_WIDTH 1
+ad_ip_instance axi_pwm_gen cnv_generator
+ad_ip_parameter cnv_generator CONFIG.N_PWMS 2
+ad_ip_parameter cnv_generator CONFIG.PULSE_0_PERIOD $sampling_cycle
+ad_ip_parameter cnv_generator CONFIG.PULSE_0_WIDTH 1
+ad_ip_parameter cnv_generator CONFIG.PULSE_1_PERIOD $sampling_cycle
+ad_ip_parameter cnv_generator CONFIG.PULSE_1_WIDTH 1
+ad_ip_parameter cnv_generator CONFIG.PULSE_1_OFFSET 0
 
 ad_ip_instance spi_axis_reorder data_reorder
 ad_ip_parameter data_reorder CONFIG.NUM_OF_LANES $NUM_OF_SDI
@@ -109,7 +113,7 @@ if {$CAPTURE_ZONE == 1} {
 
   # Zone 2 - trigger to next consecutive CNV
   ad_ip_parameter spi_ad463x/offload CONFIG.ASYNC_TRIG 1
-  ad_connect cnv_generator/pulse spi_ad463x/trigger
+  ad_connect cnv_generator/pwm_0 spi_ad463x/trigger
 
   ## SPI mode is using the echo SCLK, on echo SPI and Master mode the BUSY
   #  is used for SDI latching
@@ -147,7 +151,7 @@ if {$CAPTURE_ZONE == 1} {
   exit 2
 
 }
-ad_connect ad463x_cnv cnv_generator/pulse
+ad_connect ad463x_cnv cnv_generator/pwm_1
 
 # clocks
 
