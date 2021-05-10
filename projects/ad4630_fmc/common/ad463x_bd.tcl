@@ -103,8 +103,8 @@ if {$CAPTURE_ZONE == 1} {
   ad_connect spi_ad463x/axi_regmap/spi_resetn busy_sync/out_resetn
 
   ad_connect ad463x_busy busy_sync/in_bits
-  ad_connect busy_sync/out_bits busy_capture/in
-  ad_connect busy_capture/out spi_ad463x/trigger
+  ad_connect busy_sync/out_bits busy_capture/signal_in
+  ad_connect busy_capture/signal_out spi_ad463x/trigger
 
   ## SDI is latched by the SPIE execution module
   ad_connect  spi_ad463x/m_axis_sample data_reorder/s_axis
