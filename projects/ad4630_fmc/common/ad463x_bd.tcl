@@ -7,7 +7,16 @@ set CAPTURE_ZONE $ad_project_params(CAPTURE_ZONE)
 set CLK_MODE $ad_project_params(CLK_MODE)
 set DDR_EN $ad_project_params(DDR_EN)
 
+puts "build parameters: NUM_OF_SDI: $NUM_OF_SDI ; CAPTURE_ZONE: $CAPTURE_ZONE ; CLK_MODE: $CLK_MODE ;DDR_EN: $DDR_EN"
+
 # block design ports and interfaces
+# specify the CNV generator's reference clock frequency in MHz
+# NOTE: this is a default value, software may or may not change this
+set cnv_ref_clk 100
+
+# specify ADC sampling rate in samples/seconds
+# NOTE: this is a default value, software may or may not change this
+set adc_sampling_rate 1000000
 
 #create_bd_intf_port -mode Master -vlnv analog.com:interface:spi_master_rtl:1.0 ad463x_spi
 

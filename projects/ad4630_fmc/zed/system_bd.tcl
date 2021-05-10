@@ -2,14 +2,6 @@
 source $ad_hdl_dir/projects/scripts/adi_pd.tcl
 source $ad_hdl_dir/projects/common/zed/zed_system_bd.tcl
 
-# specify the CNV generator's reference clock frequency in MHz
-# NOTE: this is a default value, software may or may not change this
-set cnv_ref_clk 100
-
-# specify ADC sampling rate in samples/seconds
-# NOTE: this is a default value, software may or may not change this
-set adc_sampling_rate 1000000
-
 # add RTL source that will be instantiated in system_bd directly
 adi_project_files ad463x_fmc_zed [list \
   "$ad_hdl_dir/library/common/ad_edge_detect.v" \
